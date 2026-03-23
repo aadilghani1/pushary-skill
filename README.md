@@ -33,7 +33,7 @@ Pushary is an [MCP server](https://modelcontextprotocol.io/) that connects your 
 ### 1. Install the skill
 
 ```bash
-npx skills add pushary/pushary-skill
+npx skills add aadilghani1/pushary-skill
 ```
 
 ### 2. Add the MCP server

@@ -1,6 +1,6 @@
 ---
 name: pushary
-description: Push notifications and human-in-the-loop for AI coding agents. Send alerts when tasks finish, ask yes/no questions via push, get answers from the user's lock screen. Works with Cursor, Claude Code, Windsurf, and any MCP client.
+description: Push notifications and human-in-the-loop for AI coding agents. Send alerts when tasks finish, ask yes/no questions via push, get answers from the user's lock screen. Use when the user mentions "notify me", "push notification", "let me know when done", "alert me", "ask me on my phone", or when a long-running task completes. Works with Cursor, Claude Code, Windsurf, and any MCP client.
 metadata:
   tags: notifications, push, mcp, human-in-the-loop, cursor, claude, windsurf, alerts
 ---
