@@ -6,7 +6,7 @@ Thanks for your interest in contributing! This guide will help you get started.
 
 ### Reporting Bugs
 
-If something isn't working as expected, [open a bug report](https://github.com/aadilghani1/pushary-skill/issues/new?template=bug_report.md). Please include:
+If something isn't working as expected, [open a bug report](https://github.com/pushary/pushary-skill/issues/new?template=bug_report.md). Please include:
 
 - Which AI agent you're using (Cursor, Claude Code, Windsurf, etc.)
 - Your MCP configuration
@@ -15,7 +15,7 @@ If something isn't working as expected, [open a bug report](https://github.com/a
 
 ### Suggesting Features
 
-Have an idea for improving the skill? [Open a feature request](https://github.com/aadilghani1/pushary-skill/issues/new?template=feature_request.md). We'd love to hear how Pushary could work better for your workflow.
+Have an idea for improving the skill? [Open a feature request](https://github.com/pushary/pushary-skill/issues/new?template=feature_request.md). We'd love to hear how Pushary could work better for your workflow.
 
 ### Submitting Changes
 
@@ -41,4 +41,4 @@ This repository contains the skill definition (not the Pushary backend), so cont
 
 ## Questions?
 
-If you're not sure about something, [open a discussion](https://github.com/aadilghani1/pushary-skill/issues) or reach out. We're happy to help.
+If you're not sure about something, [open a discussion](https://github.com/pushary/pushary-skill/issues) or reach out. We're happy to help.

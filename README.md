@@ -7,7 +7,7 @@
     &nbsp;&middot;&nbsp;
     <a href="https://skills.sh/">Skills directory</a>
     &nbsp;&middot;&nbsp;
-    <a href="https://github.com/aadilghani1/pushary-skill/issues">Report a bug</a>
+    <a href="https://github.com/pushary/pushary-skill/issues">Report a bug</a>
   </p>
 </p>
 
@@ -33,7 +33,7 @@ Pushary is an [MCP server](https://modelcontextprotocol.io/) that connects your 
 ### 1. Install the skill
 
 ```bash
-npx skills add aadilghani1/pushary-skill
+npx skills add pushary/pushary-skill
 ```
 
 ### 2. Add the MCP server
