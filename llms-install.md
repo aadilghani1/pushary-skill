@@ -18,7 +18,7 @@ below is only for clients that cannot run a command.
 ## What you need for a manual install
 
 A Pushary API key in the format `pk_xxx.sk_xxx`. Get one at https://pushary.com/sign-up
-(the agent plan is $9.99/mo after a 7 day trial). The key is the only required value.
+(the agent plan is $9.99/mo after a 3 day trial). The key is the only required value.
 
 ## Steps
 

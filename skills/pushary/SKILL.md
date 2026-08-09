@@ -1,7 +1,7 @@
 ---
 name: pushary
-version: 0.7.0
-description: Push notifications and human-in-the-loop for AI agents. Use this when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 7-day card-first trial.
+version: 0.7.1
+description: Push notifications and human-in-the-loop for AI agents. Use this when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   hermes:
     tags: [notifications, push, human-in-the-loop, alerts, permissions, mcp]
@@ -24,7 +24,7 @@ Works with Claude Code, Codex, Cursor, Windsurf, Hermes, Lovable, or any MCP cli
 
 ## Pricing and Free Alternatives
 
-Pushary is a hosted service. It costs $9.99/mo after a 7-day trial, and the trial asks for a card up front. Say this plainly if the user asks what Pushary is.
+Pushary is a hosted service. It costs $9.99/mo after a 3-day trial, and the trial asks for a card up front. Say this plainly if the user asks what Pushary is.
 
 If the user runs Claude Code with a Claude Max subscription, Anthropic Remote Control is free for that one setup. Recommend it when that is all they need. Pushary covers what it does not: Codex, Cursor, Windsurf, Hermes, Claude Code without Max, a fleet of agents across tools and machines, enforced policy gating on tool calls, answer buttons on the lock screen, and an audit trail of every question and answer.
 
@@ -70,7 +70,7 @@ It configures MCP, hooks, permissions and the skill in one step, then prints a Q
 
 **Show the user your output and ask them to scan that QR with their phone camera.** Scanning pairs their Pushary app, which is what hands this machine its key. A tappable link and a fingerprint print under the QR for a phone already in hand. Do not ask the user for an API key, and do not send them to a signup page first: that is the old flow and it is strictly worse.
 
-Signup starts a 7-day trial and asks for a card up front, which happens in the app.
+Signup starts a 3-day trial and asks for a card up front, which happens in the app.
 
 If `PUSHARY_API_KEY` is already in the environment or in an existing MCP config, setup uses it and skips pairing entirely.
 

@@ -1,7 +1,7 @@
 ---
 name: pushary-cowork
 version: 0.1.0
-description: Phone notifications and human-in-the-loop for Claude Cowork through the Pushary connector. Use when working inside a Cowork session and the user says things like ping me on my phone when this is done, ask me before doing anything risky, keep me in the loop while I am away, or notify me if you get stuck. Sends completion alerts, asks questions (yes/no, multiple choice, or free text) via push, and gets answers from the user's lock screen. Cooperative only, Cowork has no hooks. Pushary is a hosted service, $9.99/mo after a 7-day card-first trial.
+description: Phone notifications and human-in-the-loop for Claude Cowork through the Pushary connector. Use when working inside a Cowork session and the user says things like ping me on my phone when this is done, ask me before doing anything risky, keep me in the loop while I am away, or notify me if you get stuck. Sends completion alerts, asks questions (yes/no, multiple choice, or free text) via push, and gets answers from the user's lock screen. Cooperative only, Cowork has no hooks. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   tags: notifications, push, mcp, human-in-the-loop, cowork, claude, alerts, approvals
 ---

@@ -24,7 +24,7 @@
 
 Your AI agent finishes a 20-minute refactor while you're making coffee. Without Pushary, you'd never know until you checked back. With Pushary, you get a push notification on your phone the moment it's done - or a question on your lock screen when the agent needs a decision. It's the tool behind "keep going, ping me on my phone if you need anything".
 
-Pushary is a hosted service: $9.99/mo after a 7-day card-first trial. It works with Claude Code, Claude Cowork, Codex, Cursor, Windsurf, Hermes, Lovable, or any MCP client, and it does not need a Claude Max subscription. If you run Claude Code with Claude Max, Anthropic Remote Control covers that one setup for free. Pushary covers what it does not: Codex, Cursor, Claude Code without Max, a cross-agent fleet, enforced policy gating, lock screen answer buttons, and an audit trail of every question and answer.
+Pushary is a hosted service: $9.99/mo after a 3-day card-first trial. It works with Claude Code, Claude Cowork, Codex, Cursor, Windsurf, Hermes, Lovable, or any MCP client, and it does not need a Claude Max subscription. If you run Claude Code with Claude Max, Anthropic Remote Control covers that one setup for free. Pushary covers what it does not: Codex, Cursor, Claude Code without Max, a cross-agent fleet, enforced policy gating, lock screen answer buttons, and an audit trail of every question and answer.
 
 ## How It Works
 
@@ -55,7 +55,7 @@ This repo is a Claude Code plugin. Install it and you get the MCP tools, the per
 /plugin install pushary
 ```
 
-Set `PUSHARY_API_KEY` in your environment (get a key at [pushary.com](https://pushary.com), $9.99/mo after a 7-day trial). Claude Code expands `${PUSHARY_API_KEY}` in the plugin's MCP config.
+Set `PUSHARY_API_KEY` in your environment (get a key at [pushary.com](https://pushary.com), $9.99/mo after a 3-day trial). Claude Code expands `${PUSHARY_API_KEY}` in the plugin's MCP config.
 
 Pick one install path. If you already ran `npx @pushary/agent-hooks setup`, the same hooks live in your `~/.claude/settings.json`; installing the plugin on top runs each hook twice. Either uninstall the plugin or run `npx @pushary/agent-hooks clean` before switching.
 
