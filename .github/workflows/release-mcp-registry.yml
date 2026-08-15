@@ -1,0 +1,116 @@
+# Publishes server.json to the MCP registry when it changes on main.
+#
+# WHY THIS LIVES IN THE MIRROR RATHER THAN THE MONOREPO.
+#
+# modelcontextprotocol/registry grants a publish permission of
+# `io.github.<repository_owner>/*`, read off the OIDC token's `repository_owner`
+# claim. This repository's owner is Pushary and the server is
+# `io.github.Pushary/pushary`, so `mcp-publisher login github-oidc` works here
+# with no secret at all. The same job in the private monorepo can only ever mint
+# `io.github.aadilghani1/*`, which is why it needs a PAT there and none here.
+#
+# server.json IS GENERATED. Its source is packages/skill/server.json in the
+# monorepo and it arrives through scripts/sync-mirrors.mjs. Do not hand-edit it
+# here: the next sync overwrites it. That sync excludes .github, so this workflow
+# survives every push.
+#
+# The registry caps `description` at 100 characters and answers anything longer
+# with a 422. The monorepo gates that on its PRs; the validate step below is the
+# backstop in case something reaches this repo another way.
+
+name: Release MCP registry entry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - server.json
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate and resolve the published version. Do not publish."
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release-mcp-registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Cheap gate first: decide publish or skip from the public registry read,
+      # before installing anything. The registry serves one record per version, so
+      # republishing a version it already holds is an error rather than a no-op.
+      - name: Decide action (publish / skip)
+        id: decide
+        run: |
+          LOCAL=$(node -p "require('./server.json').version")
+          NAME=$(node -p "require('./server.json').name")
+          REMOTE=$(curl -sf "https://registry.modelcontextprotocol.io/v0/servers?search=pushary" \
+            | node -e '
+              let raw = ""
+              process.stdin.on("data", (c) => (raw += c))
+              process.stdin.on("end", () => {
+                const name = process.argv[1]
+                let latest = "0.0.0"
+                try {
+                  for (const row of JSON.parse(raw).servers ?? []) {
+                    const meta = row._meta?.["io.modelcontextprotocol.registry/official"]
+                    if (row.server?.name === name && meta?.isLatest) latest = row.server.version
+                  }
+                } catch {}
+                process.stdout.write(latest)
+              })
+            ' "$NAME" || echo "unknown")
+          echo "name=$NAME local=$LOCAL published=$REMOTE"
+          echo "local=$LOCAL" >> "$GITHUB_OUTPUT"
+          echo "remote=$REMOTE" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "action=validate" >> "$GITHUB_OUTPUT"
+          elif [ "$LOCAL" = "$REMOTE" ]; then
+            echo "Version $LOCAL is already the registry's latest; nothing to publish."
+            echo "action=skip" >> "$GITHUB_OUTPUT"
+          else
+            echo "action=publish" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install mcp-publisher
+        if: steps.decide.outputs.action != 'skip'
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Validate server.json
+        if: steps.decide.outputs.action != 'skip'
+        run: ./mcp-publisher validate
+
+      - name: Publish to the MCP registry
+        if: steps.decide.outputs.action == 'publish'
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
+
+      - name: Confirm what the registry now serves
+        if: steps.decide.outputs.action == 'publish'
+        run: |
+          sleep 5
+          curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=pushary" \
+            | node -e '
+              let raw = ""
+              process.stdin.on("data", (c) => (raw += c))
+              process.stdin.on("end", () => {
+                for (const row of JSON.parse(raw).servers ?? []) {
+                  const meta = row._meta?.["io.modelcontextprotocol.registry/official"]
+                  if (row.server?.name === "io.github.Pushary/pushary" && meta?.isLatest) {
+                    console.log("registry now serves", row.server.version)
+                  }
+                }
+              })
+            '
