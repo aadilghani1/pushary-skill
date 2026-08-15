@@ -1,6 +1,6 @@
 ---
 name: pushary-cowork
-version: 0.2.0
+version: 0.3.0
 description: Phone notifications and human-in-the-loop for Claude Cowork through the Pushary connector. Use inside a Cowork session whenever you need a human and nobody is watching the session: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a task finishes or fails with nobody watching. Also use it when the user says things like ping me on my phone when this is done, ask me before doing anything risky, keep me in the loop while I am away, or notify me if you get stuck. Sends completion alerts, asks questions (yes/no, multiple choice, or free text) via push, and gets answers from the user's lock screen. Cooperative only, Cowork has no hooks. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   tags: notifications, push, mcp, human-in-the-loop, cowork, claude, alerts, approvals
@@ -9,6 +9,10 @@ metadata:
 # Pushary for Claude Cowork
 
 Pushary is connected as a custom connector. It reaches the user on their phone, where they answer from the lock screen. Use it proactively. Do not wait for the user to ask.
+
+## Ask in as few interruptions as possible
+
+Every question costs the user their attention wherever they are. Before a run of more than a step or two, work out where you will need a human and fold those points together: one `select` carrying the real options beats three `confirm`s in a row, ask once at a boundary rather than once per instance, and never ask what you can determine yourself from the task or from a tool call you can make.
 
 ## When to reach out
 

@@ -1,7 +1,7 @@
 ---
 name: pushary
-version: 0.8.0
-description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
+version: 0.9.0
+description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Every question and answer is recorded, so an unattended run stays reviewable afterwards. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   hermes:
     tags: [notifications, push, human-in-the-loop, alerts, permissions, mcp]
@@ -40,6 +40,19 @@ If no phone or browser is connected, `ask_user` says so in its response and the 
 Pushary is a hosted service. It costs $9.99/mo after a 3-day trial, and the trial asks for a card up front. Say this plainly if the user asks what Pushary is.
 
 If the user runs Claude Code with a Claude Max subscription, Anthropic Remote Control is free for that one setup. Recommend it when that is all they need. Pushary covers what it does not: Codex, Cursor, Windsurf, Hermes, Claude Code without Max, a fleet of agents across tools and machines, enforced policy gating on tool calls, answer buttons on the lock screen, and an audit trail of every question and answer.
+
+## Plan the Questions Before You Start
+
+Every question costs the user their attention wherever they happen to be. That cost is the only real limit on this tool, so spend it deliberately. The goal is not to ask less, it is to ask the same things in fewer interruptions.
+
+Before a run of more than a step or two, work out where you will need a human, then fold those points together:
+
+- **A fork you find while planning can be merged into one question.** A fork you find halfway through costs its own interruption. Finding them early is the whole saving.
+- **One `select` carrying the real options beats three sequential `confirm`s.** Same information, a third of the interruptions.
+- **Ask once at the boundary, not once per instance.** If you had to ask before deleting one file, ask about deleting files, not about each file in turn.
+- **Never ask what you can determine.** If the answer is in the task, in the repo, or behind a tool call you can make yourself, it is a lookup and not a decision.
+
+`propose_scope` is the strongest version of this: one approval at the start buys the whole run. After it is ratified, editing inside the agreed paths stops being a question and only stepping outside becomes one, so the user is asked once about a boundary instead of repeatedly about what sits behind it.
 
 ## When to Use
 
@@ -119,54 +132,23 @@ npx @pushary/agent-hooks@latest doctor
 
 ## Tools
 
+Every parameter and every returned field is described in each tool's own schema,
+which your client already has and which is always current. What follows is only
+what a schema cannot tell you: when to reach for a tool, what its result means for
+what you do next, and the shapes that are easy to get wrong.
+
 ### send_notification
 
 Send a one-way push notification to the user. Optionally include structured context for a rich detail page.
 
-**Parameters:**
+`context.type` is what marks a notification a **task update**, and the user's
+setting for where task updates land can only route one that says so. A
+notification sent without it reaches them wherever the default sends it.
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| title | string | Yes | Notification title (max 100 chars, aim for under 60) |
-| body | string | Yes | Notification body (max 500 chars, aim for under 200) |
-| url | string | No | URL opened when tapped. Ignored if context is provided. |
-| agentName | string | No | Identifies which agent sent this (e.g., "Claude Code - myproject") |
-| iconUrl | string | No | Custom notification icon URL |
-| imageUrl | string | No | Large image shown in the notification |
-| sessionId | string | No | Opaque per-session id of the sending agent, so parallel sessions are attributed separately (max 128 chars) |
-| machineId | string | No | Stable machine id of the sending agent, so two machines never collapse into one session (max 128 chars) |
-| subscriberIds | string[] | No | Target specific subscriber IDs |
-| externalIds | string[] | No | Target by external IDs |
-| tags | string[] | No | Target by subscriber tags |
-| context | object | Yes for task updates | Structured context for a rich detail page (see below). `context.type` marks the notification a task update, and the user's setting for where task updates land can only route one that says so. |
-
-**Context object:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| type | "task_complete" / "error" / "info" | The kind of notification |
-| summary | string | Short summary of what happened |
-| details | string[] | Bullet-point details |
-| filesChanged | string[] | List of files that were changed |
-| errorMessage | string | Error message (for error type) |
-| errorFile | string | File path where the error occurred |
-| nextSteps | string | Suggested next steps for the user |
-| askQuestion | object | Embed a decision prompt in the notification (see below) |
-
-**Embedded askQuestion:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| question | string | A follow-up question shown below the context |
-| type | "confirm" / "select" / "input" | Question type (default: confirm) |
-| options | string[] | Options for select type (2-6 items) |
-
-When `askQuestion` is provided, the response includes a `linkedCorrelationId` you pass to `wait_for_answer`.
-
-**Returns:**
-- `delivery` - per-channel result: `{ "web": { "recipients": <n> }, "mobile": { "recipients": <n> } }` (each channel may also include a `status` like `no_recipients` or `not_configured`)
-- `sent` - total devices reached across all channels
-- `warning` - present only when the notification reached 0 devices because no phone or browser is connected; the user must connect one in the dashboard under Settings then Connections
+On a long run where the user is likely away, prefer `context.askQuestion` over a
+blocking `ask_user`. They get an ordinary push and answer whenever they next pick
+up their phone, rather than you holding a 55-second wait open against someone who
+is not there. Poll the returned `linkedCorrelationId` when you need the result.
 
 **Example - task completed with context:**
 
@@ -209,36 +191,15 @@ When `askQuestion` is provided, the response includes a `linkedCorrelationId` yo
 
 Send a question to the user via push notification and wait for their answer. By default, this tool **blocks** until the user responds or the timeout is reached - no need to call `wait_for_answer` separately.
 
-**Parameters:**
+Always read `answered` rather than assuming the call blocked. It comes back false
+in three different situations that mean different things: the wait timed out and
+the question is still live (`timedOut`), the site policy is notify_only so nothing
+was awaited (`status: "notified"`), or you passed `wait: false` yourself
+(`status: "pending"`). All three leave a `correlationId` you can poll.
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| question | string | Yes | The question to ask (max 500 chars) |
-| type | "confirm" / "select" / "input" | No | Question type (default: confirm) |
-| options | string[] | No | Choices for select type (2-6 options). Required when type is select. |
-| placeholder | string | No | Placeholder text for input type (max 200 chars) |
-| context | string | No | What the agent is working on, shown above the question (max 500 chars) |
-| wait | boolean | No | Wait for the answer before returning (default: true). Set false for manual polling. |
-| timeoutMs | integer | No | Max wait time in ms (max 55000). Uses site policy if omitted. |
-| agentName | string | No | Identifies which agent is asking. Format: "{Agent} - {project}" (e.g., "Claude Code - myproject") |
-| sessionId | string | No | Opaque per-session id of the asking agent, so parallel sessions are attributed separately (max 128 chars) |
-| machineId | string | No | Stable machine id of the asking agent, so two machines never collapse into one session (max 128 chars) |
-| toolName | string | No | The tool this approval is for (e.g. "Bash"), so the user can choose to always-allow it (max 100 chars) |
-| toolTarget | string | No | Compact target of the tool call (e.g. command head "git push" for Bash, or a file extension like ".ts" for Edit/Write). Used to mine always-allow policy suggestions (max 80 chars) |
-| callbackUrl | string | No | Webhook URL to POST the answer to when the user responds |
-| subscriberIds | string[] | No | Target specific subscriber IDs |
-| externalIds | string[] | No | Target by external IDs |
-| tags | string[] | No | Target by subscriber tags |
-
-**Returns (when wait=true, default):**
-- `{ "answered": true, "value": "yes", "correlationId": "uuid" }` - user responded
-- `{ "answered": false, "timedOut": true, "correlationId": "uuid" }` - timeout reached
-
-**Returns (when wait=false):**
-- `{ "correlationId": "uuid", "status": "pending", "expiresInSeconds": 600 }` - use `wait_for_answer` to poll
-
-**Returns (when the site policy is notify_only):**
-- `{ "correlationId": "uuid", "status": "notified", "answered": false, "mode": "notify_only" }` - the question was pushed but no answer was awaited (the user gets a heads-up, not a blocking prompt). Call `wait_for_answer` if you want to poll for a response anyway.
+Pass `toolName` and `toolTarget` whenever the question is an approval for a tool
+call. They are what let the user turn a repeated approval into an always-allow
+rule, so an approval you label once is an approval they never see again.
 
 **Example - confirm (yes/no):**
 
@@ -277,28 +238,19 @@ Send a question to the user via push notification and wait for their answer. By 
 
 ### wait_for_answer
 
-Poll for the user's response to a question sent via `ask_user` with `wait: false`. Not needed when using the default blocking mode.
+Poll for the user's response to a question sent via `ask_user` with `wait: false`, or to one that timed out. Not needed when using the default blocking mode.
 
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| correlationId | string (uuid) | Yes | The correlationId from ask_user |
-| timeoutMs | integer | No | How long to wait (default 30000, max 55000) |
-
-**Returns:**
-- `{ "answered": true, "value": "yes" }` - user responded
-- `{ "answered": false }` - timeout reached, no answer yet
+A single call waits at most 55 seconds but the question stays answerable for 10
+minutes, so one empty return is not a refusal. Retry with the same
+`correlationId` up to three times at `timeoutMs: 55000` before treating it as
+unanswered.
 
 ### cancel_question
 
 Cancel a pending question so it can no longer be answered. Use when the question becomes irrelevant (e.g., you found the answer another way or the user responded in chat).
 
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| correlationId | string (uuid) | Yes | The correlationId of the question to cancel |
+A stale approval arriving twenty minutes later is worse than no approval, because
+it reads as consent to work that has already moved on.
 
 ### propose_scope
 
@@ -308,21 +260,13 @@ The user sees the paths you intend to change, the areas you promise to leave alo
 
 Use glob syntax (`src/**`, `**/*.test.ts`). Shell commands are **not** scoped here; they stay governed by the permission policy.
 
-**Parameters:**
+`ratified` and `answered` are separate on purpose. Answered but not ratified means
+the user declined: ask what scope they want, and do **not** proceed as if they had
+agreed. Not answered means the scope is simply not in force.
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| doneWhen | string | Yes | What "finished" means for this run. Carried for the human to judge against, never enforced automatically |
-| sessionId | string | Yes | Your per-session id. A scope with no session cannot be enforced and must never leak into another run |
-| allowedPaths | string[] | No | Globs you intend to change. Omit to propose no path restriction, which the user is told plainly |
-| offLimitsPaths | string[] | No | Globs you promise not to touch. These win wherever they overlap `allowedPaths` |
-| agentName | string | No | Name of the agent asking, format `"{Agent} - {project}"` |
-| timeoutMs | integer | No | How long this call blocks, max 55000 |
-
-**Returns:**
-- `{ "ratified": true, "answered": true, "value": "yes", "contract": {...} }` - the contract is live
-- `{ "ratified": false, "answered": true, "value": "no" }` - the user declined. Ask what scope they want; do **not** proceed as if they agreed
-- `{ "ratified": false, "answered": false }` - no answer yet. The scope is **not** in force
+Omitting `allowedPaths` proposes no path restriction, and the user is told that
+plainly as "this agent is asking to touch anything", so omit it only when you mean
+it.
 
 **What enforcement depends on.** The contract is recorded and shown to the user by any MCP client. Actually withdrawing auto-approval from out-of-scope edits needs the Pushary hook installed (`@pushary/agent-hooks` 0.59.0 or later), which is how Claude Code, Codex and Gemini CLI run. Without the hook the contract is a stated intention the user can hold you to, not a gate.
 
@@ -334,15 +278,9 @@ Scope lives for the session only and is never inherited by another run.
 
 Read-only. Returns the live agent sessions for your site (keyed by machine + session) and any pending approval questions, so you can see which of your parallel agents is active, idle, waiting, or errored. Does NOT start, stop, or steer agents, and sends no notification. Useful when you are one of several agents and want to check whether another session is blocked on a question before acting.
 
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| status | "active" / "idle" / "waiting" / "errored" | No | Filter to sessions with this computed status |
-| limit | integer | No | Max number of sessions to return, most recently seen first (1-100) |
-
-**Returns:**
-- `{ "sessions": [...], "pendingQuestions": [...] }` - current sessions and open questions for the site
+Check it before asking when you are one of several agents: if another session is
+already blocked on a question, adding a second one competes for the same
+attention rather than getting you answered sooner.
 
 ## Permission Gating (REQUIRED)
 
