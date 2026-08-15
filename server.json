@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Pushary/pushary",
   "title": "Pushary",
-  "description": "Notify me when my agent needs me: approve from my phone, answer questions away from the terminal.",
-  "version": "1.1.0",
+  "description": "Reach a human from a running agent. Ask before an irreversible action, when a decision is outside the agent's authority, or when a long task finishes with nobody watching, and get the answer back from the user's lock screen.",
+  "version": "1.2.0",
   "repository": {
     "url": "https://github.com/Pushary/pushary-skill",
     "source": "github"

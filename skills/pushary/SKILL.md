@@ -1,7 +1,7 @@
 ---
 name: pushary
-version: 0.7.1
-description: Push notifications and human-in-the-loop for AI agents. Use this when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
+version: 0.8.0
+description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   hermes:
     tags: [notifications, push, human-in-the-loop, alerts, permissions, mcp]
@@ -21,6 +21,19 @@ When the user says "keep going, ping me on my phone if you need anything", this 
 Use these tools proactively. Do not wait for the user to ask for notifications.
 
 Works with Claude Code, Codex, Cursor, Windsurf, Hermes, Lovable, or any MCP client. No Claude Max subscription required.
+
+## Reach for This Without Being Asked
+
+Nobody has to say "ping me". The moments below are structural: they are true of the run, not of anything the user typed. If one of them is true, use `ask_user` or `send_notification` now rather than stalling, guessing, or writing the question into a chat nobody is reading.
+
+- **You are about to do something irreversible.** Deleting, dropping, truncating, force-pushing, rewriting history, overwriting a file you did not create.
+- **You are about to spend money or touch production.** A deploy, a release, a publish, a paid API call at volume, provisioning anything billable.
+- **The decision is outside your authority.** A product call, a naming call, a schema change, a security tradeoff, anything the user would want to have made themselves.
+- **You are running unattended and hit a real ambiguity.** Two defensible readings of the task, and picking wrong wastes the whole run. Ask instead of guessing.
+- **Another skill's workflow says to confirm with the user.** That instruction assumes someone is watching the terminal. Often nobody is. Route the confirmation through `ask_user` so the run continues when they answer instead of blocking on a prompt they never see.
+- **A long task finished or failed and nobody is watching.** Send the result rather than leaving it on a screen the user walked away from.
+
+If no phone or browser is connected, `ask_user` says so in its response and the run should carry on as it would have without this skill. Never block a task on an answer that cannot arrive.
 
 ## Pricing and Free Alternatives
 
@@ -125,7 +138,7 @@ Send a one-way push notification to the user. Optionally include structured cont
 | subscriberIds | string[] | No | Target specific subscriber IDs |
 | externalIds | string[] | No | Target by external IDs |
 | tags | string[] | No | Target by subscriber tags |
-| context | object | No | Structured context for a rich detail page (see below) |
+| context | object | Yes for task updates | Structured context for a rich detail page (see below). `context.type` marks the notification a task update, and the user's setting for where task updates land can only route one that says so. |
 
 **Context object:**
 

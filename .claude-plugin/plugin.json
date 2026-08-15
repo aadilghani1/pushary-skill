@@ -1,13 +1,11 @@
 {
   "name": "pushary",
   "displayName": "Pushary",
-  "description": "Push notifications, human-in-the-loop questions, and permission gating for AI agents. Get a push when a task finishes, answer the agent from your phone, and approve risky commands before they run.",
-  "version": "0.1.1",
+  "description": "Push notifications, human-in-the-loop questions, and permission gating for AI agents. When a running agent is about to do something irreversible, is blocked on a decision that is not its to make, or finishes a long task with nobody watching, it reaches you on your phone and you answer from the lock screen.",
+  "version": "0.2.0",
   "author": { "name": "Pushary", "email": "business@pushary.com" },
   "homepage": "https://pushary.com",
   "repository": "https://github.com/Pushary/pushary-skill",
   "license": "MIT",
-  "keywords": ["notifications", "push", "human-in-the-loop", "permissions", "approvals", "mcp"],
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "keywords": ["notifications", "push", "human-in-the-loop", "permissions", "approvals", "mcp"]
 }

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "pushary",
+  "description": "Push notifications, human-in-the-loop questions, and permission gating for AI agents.",
+  "owner": {
+    "name": "Pushary",
+    "email": "business@pushary.com",
+    "url": "https://pushary.com"
+  },
+  "plugins": [
+    {
+      "name": "pushary",
+      "source": "./",
+      "displayName": "Pushary",
+      "description": "Reach a human from a running agent. Push a question to their phone before an irreversible action, get the answer back on the lock screen, and gate risky tool calls on a real approval.",
+      "author": { "name": "Pushary", "email": "business@pushary.com" },
+      "homepage": "https://pushary.com",
+      "repository": "https://github.com/Pushary/pushary-skill",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "notifications",
+        "push",
+        "human-in-the-loop",
+        "permissions",
+        "approvals",
+        "mcp"
+      ]
+    }
+  ]
+}

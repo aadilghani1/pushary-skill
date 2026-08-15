@@ -1,7 +1,7 @@
 ---
 name: pushary-hermes
-version: 0.5.1
-description: Push notifications and human-in-the-loop for Hermes Agent. Send alerts when tasks finish, ask questions (yes/no, multiple choice, or free text) via web push, and get answers from the user's lock screen. Use these tools proactively when the user is not actively in a chat session. Works alongside Hermes's built-in messaging platforms (Telegram, Discord, etc.) as a universal fallback channel.
+version: 0.6.0
+description: Push notifications and human-in-the-loop for Hermes Agent. Use this whenever a running agent needs a human and no chat session is active: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Send alerts when tasks finish, ask questions (yes/no, multiple choice, or free text) via web push, and get answers from the user's lock screen. Use these tools proactively when the user is not actively in a chat session. Works alongside Hermes's built-in messaging platforms (Telegram, Discord, etc.) as a universal fallback channel.
 metadata:
   hermes:
     tags: [notifications, push, human-in-the-loop, alerts, permissions]
@@ -25,6 +25,7 @@ Pushary adds web push notifications as a delivery channel for Hermes. Use it whe
 - You need to reach the user's phone lock screen for a quick decision
 - A background task finishes and the user may have walked away
 - Permission escalation - a dangerous command needs approval
+- Another skill's workflow says to confirm with the user, and no chat session is active to confirm in
 - The user explicitly asked for push notifications
 
 **Use the active Hermes platform when:**
@@ -72,7 +73,7 @@ Send a one-way push notification. Optionally include structured context for a ri
 | title | string | Yes | Notification title (max 100 chars, aim for under 60) |
 | body | string | Yes | Notification body (max 500 chars, aim for under 200) |
 | agentName | string | No | Identifies this Hermes instance (e.g., "Hermes - daily-briefing") |
-| context | object | No | Rich context with type, summary, details, filesChanged, errorMessage, nextSteps |
+| context | object | Yes for task updates | Rich context with type, summary, details, filesChanged, errorMessage, nextSteps. `context.type` marks the notification a task update, and the user's setting for where task updates land can only route one that says so. |
 
 **Example - cron task completed:**
 

@@ -1,7 +1,7 @@
 ---
 name: pushary
-version: 0.5.0
-description: Push notifications for AI agents. Ask questions, send alerts, get answers from user's phone.
+version: 0.6.0
+description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says ping me on my phone, notify me when my agent needs me, approve from my phone, or run this overnight. Ask questions, send alerts, get answers from the user's lock screen.
 metadata:
   tags: notifications, push, mcp, human-in-the-loop
 ---
@@ -9,6 +9,8 @@ metadata:
 # Pushary - Push Notifications for AI Agents
 
 Three tools. Use proactively - don't wait for the user to ask.
+
+Reach for them without being asked when: you are about to do something irreversible, spend money, or touch production; the decision is outside your authority; you are unattended and hit a real ambiguity; another skill's workflow says to confirm with the user; or a long task finished with nobody watching.
 
 ## ask_user
 
@@ -26,8 +28,13 @@ Types: `confirm` (yes/no), `select` (2-6 options via `options` array), `input` (
 
 One-way alert. Use when a task completes, errors, or needs attention.
 
+Always pass `context.type`: `task_complete`, `error`, or `info`. It is what marks
+the notification as a task update, and the user's setting for where task updates
+land can only route one that says so.
+
 ```json
-{ "title": "Build complete", "body": "All tests passing", "agentName": "Codex - myproject" }
+{ "title": "Build complete", "body": "All tests passing", "agentName": "Codex - myproject",
+  "context": { "type": "task_complete", "summary": "17 tests, 0 failures" } }
 ```
 
 ## cancel_question

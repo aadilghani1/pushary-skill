@@ -334,6 +334,30 @@ Works with any agent that supports [skills.sh](https://skills.sh/) or the Model 
 - [OpenAI Codex](https://openai.com/index/openai-codex/) (MCP)
 - And [39+ more agents](https://skills.sh/)
 
+## Publishing the MCP registry entry
+
+`server.json` is not published by merging it. The [MCP registry](https://registry.modelcontextprotocol.io) serves one record per version, so an edit here reaches nobody until the new version is pushed to the registry, and the old text keeps being what every agent reads.
+
+Everyday path: bump `version` in `server.json` and merge to `main`. The `Release MCP registry entry` workflow picks it up.
+
+That workflow needs a credential it does not have yet. The registry grants publish rights as `io.github.<repository_owner>/*`, taken from the GitHub OIDC token's `repository_owner` claim. Our server is `io.github.Pushary/pushary` and the monorepo is owned by `aadilghani1`, so tokenless OIDC from the monorepo cannot reach the namespace. Until one of the two fixes in that workflow's header is applied, the run stops with an explicit error rather than passing quietly.
+
+Manual fallback, from this directory:
+
+```
+curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+./mcp-publisher login github
+./mcp-publisher publish
+```
+
+Check what the registry actually serves, which is the only number that matters:
+
+```
+curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=pushary"
+```
+
+That endpoint returns **every** version, oldest first. Read the entry whose `_meta."io.modelcontextprotocol.registry/official".isLatest` is `true`; the first row in the list is the oldest record, not the live one.
+
 ## Contributing
 
 Contributions are welcome! Please read the [contributing guide](CONTRIBUTING.md) before submitting a pull request.
