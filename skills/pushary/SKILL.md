@@ -1,6 +1,6 @@
 ---
 name: pushary
-version: 0.9.1
+version: 0.9.2
 description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal, such as before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says things like keep going and ping me on my phone if you need anything, notify me when my agent needs me, approve from my phone, ask me questions while I am away from the terminal, run this overnight, keep working while I am in a meeting, I am stepping away, do not wait for me, or wants a long task to run unattended. Send alerts when tasks finish or fail, ask questions (yes/no, multiple choice, or free text) via push, and get answers from the user's lock screen. Use these tools proactively - do not wait for the user to ask for notifications. Every question and answer is recorded, so an unattended run stays reviewable afterwards. Works with Claude Code, Codex, Cursor, VS Code, Windsurf, Hermes, Lovable, or any MCP client; no Claude Max subscription required. Pushary is a hosted service, $9.99/mo after a 3-day card-first trial.
 metadata:
   hermes:
@@ -92,11 +92,20 @@ Just run it. No account, no API key, and nothing to paste first:
 npx @pushary/agent-hooks@latest setup
 ```
 
-It configures MCP, hooks, permissions and the skill in one step, then prints a QR code and waits.
+Setup pairs first and configures MCP, hooks, permissions and the skill only once pairing succeeds. Until someone completes the steps below, nothing is written and this machine has no Pushary. Treat pairing as the task, not as a prompt to wait out.
 
-**Show the user your output and ask them to scan that QR with their phone camera.** Scanning pairs their Pushary app, which is what hands this machine its key. A tappable link and a fingerprint print under the QR for a phone already in hand. Do not ask the user for an API key, and do not send them to a signup page first: that is the old flow and it is strictly worse.
+It prints a QR, a short link under it, a fingerprint, and then waits about 15 minutes.
 
-Signup starts a 3-day trial and asks for a card up front, which happens in the app.
+**Do not summarise that output. Show it, and walk the user through all four steps:**
+
+1. **Show them the QR and the short link.** Both point at the same pairing. The link is what survives if the QR renders badly wherever they are reading you, so give them both and say so.
+2. **They need the Pushary app.** It is the thing that receives approvals. If they do not have it: https://pushary.com/download. Setup keeps waiting while they install it, so nobody has to restart anything.
+3. **They scan the QR, or open the link on the phone.** The app shows a fingerprint. Tell them it must match the one in your output before they approve. On a first install the app will also ask them to sign in and start a plan: $9.99/mo after a 3-day trial, card up front, all inside the app. Say this before they scan rather than letting them discover it mid-flow.
+4. **They approve.** Setup finishes on its own, and from then on your `ask_user` and `send_notification` calls arrive on their lock screen with answer buttons.
+
+Never ask the user for an API key, and never send them to a signup page first. Both are the old flow and both are worse.
+
+If setup exits without pairing, nothing was configured. Say that plainly and offer the two fallbacks below rather than pretending the tools are available.
 
 If `PUSHARY_API_KEY` is already in the environment or in an existing MCP config, setup uses it and skips pairing entirely.
 
