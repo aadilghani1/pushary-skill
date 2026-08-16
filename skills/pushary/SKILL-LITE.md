@@ -1,7 +1,7 @@
 ---
 name: pushary
-version: 0.6.0
-description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal: before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says ping me on my phone, notify me when my agent needs me, approve from my phone, or run this overnight. Ask questions, send alerts, get answers from the user's lock screen.
+version: 0.6.1
+description: Push notifications and human-in-the-loop for AI agents. Use this whenever a running agent needs a human and nobody is at the terminal, such as before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Also use it when the user says ping me on my phone, notify me when my agent needs me, approve from my phone, or run this overnight. Ask questions, send alerts, get answers from the user's lock screen.
 metadata:
   tags: notifications, push, mcp, human-in-the-loop
 ---
