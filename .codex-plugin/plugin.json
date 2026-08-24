@@ -1,6 +1,6 @@
 {
   "name": "pushary",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Push notifications and human-in-the-loop for AI agents. Get a push when a task finishes, and answer the agent from your phone while you are away from the keyboard.",
   "author": {
     "name": "Pushary",

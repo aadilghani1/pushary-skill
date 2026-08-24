@@ -1,6 +1,6 @@
 ---
 name: pushary-chatgpt
-version: 0.1.0
+version: 0.1.1
 description: For ChatGPT and Codex. Plan the work, get the plan approved once, route every decision to the user's phone, and send a push when it is done. Use this whenever a request takes more than one step, contains a choice the user should make rather than you, or will finish while the user is not reading the conversation. In Claude Code, Cursor, Windsurf or Hermes, use the pushary skill instead. Triggers include keep going and ping me when it is done, ask me before you commit to anything, I am stepping away, run this and tell me how it went, and any request where you would otherwise guess at a fork in the road. Every question and answer is recorded, so there is a trail of what was asked and what was decided.
 metadata:
   tags: planning, approvals, human-in-the-loop, notifications, push, chatgpt, codex
