@@ -202,9 +202,20 @@ Send a question to the user via push notification and wait for their answer. By 
 
 Always read `answered` rather than assuming the call blocked. It comes back false
 in three different situations that mean different things: the wait timed out and
-the question is still live (`timedOut`), the site policy is notify_only so nothing
-was awaited (`status: "notified"`), or you passed `wait: false` yourself
-(`status: "pending"`). All three leave a `correlationId` you can poll.
+the question is still live (`timedOut`), the site policy is notify_only so the
+decision belongs in the current client (`status: "notified"`), or you passed
+`wait: false` yourself (`status: "pending"`). Follow `handoffAction` when present,
+otherwise `nextAction`.
+
+For backward compatibility, `nextAction` keeps its original two values. A live timeout from `ask_user` says
+`wait_for_answer`; poll once with `timeoutMs: 55000`. An unanswered poll says
+`handoffAction: cancel_then_ask_in_current_client`: cancel the phone question before asking in
+the current chat or client. If cancellation returns `handoffAction: "stop"`, stop.
+Otherwise, if cancellation returns false, poll once for 1 second
+and honor any answer that won the race. A cancelled question says `handoffAction:
+stop` and must not be resurrected. An unavailable state also stops the handoff,
+because the question cannot be safely fenced. Expired and missing questions are
+not live timeouts.
 
 Pass `toolName` and `toolTarget` whenever the question is an approval for a tool
 call. They are what let the user turn a repeated approval into an always-allow
@@ -249,10 +260,12 @@ rule, so an approval you label once is an approval they never see again.
 
 Poll for the user's response to a question sent via `ask_user` with `wait: false`, or to one that timed out. Not needed when using the default blocking mode.
 
-A single call waits at most 55 seconds but the question stays answerable for 10
-minutes, so one empty return is not a refusal. Retry with the same
-`correlationId` up to three times at `timeoutMs: 55000` before treating it as
-unanswered.
+A single call waits at most 55 seconds. Use it once after a live `ask_user`
+timeout. If it returns `answered: false`, follow `handoffAction` when present,
+otherwise `nextAction`: ask in the current chat or client only after cancelling a still-pending phone question. If the
+cancellation loses a race, poll once for 1 second and honor the phone answer
+instead. Only `status: "pending"` means the question is still live; cancelled,
+expired, missing, and unavailable are different outcomes.
 
 ### cancel_question
 
@@ -272,6 +285,13 @@ Use glob syntax (`src/**`, `**/*.test.ts`). Shell commands are **not** scoped he
 `ratified` and `answered` are separate on purpose. Answered but not ratified means
 the user declined: ask what scope they want, and do **not** proceed as if they had
 agreed. Not answered means the scope is simply not in force.
+
+An unanswered proposal returns its `correlationId`. Poll it once; a late phone
+yes ratifies the exact stored proposal. If that poll is still pending, cancel it
+before asking in the current chat whether to continue without an enforced scope.
+If cancellation returns `handoffAction: "stop"`, stop. Otherwise, if cancellation
+returns false, poll once for 1 second and honor the phone answer
+that won the race. A yes in chat is not a server-ratified scope.
 
 Omitting `allowedPaths` proposes no path restriction, and the user is told that
 plainly as "this agent is asking to touch anything", so omit it only when you mean
@@ -303,7 +323,7 @@ Before executing any of the following, you MUST call `ask_user` with type "confi
 - Network configuration changes (firewall, DNS, proxy)
 - Any command the user has flagged as dangerous
 
-If `ask_user` returns `answered: false`, do NOT execute the command. Send a notification that the operation was skipped due to no response.
+If `ask_user` returns `answered: false`, do not execute yet and do not call the task blocked. Follow `handoffAction` when present, otherwise `nextAction`: poll once, then cancel a live phone question before asking in the current client. Execute only after an explicit "yes" from the winning surface.
 
 This is not optional. Treat it as a hard constraint, not a suggestion.
 
@@ -323,10 +343,10 @@ result = ask_user({
 if result.answered:
     // result.value = "JWT tokens" - proceed with the chosen approach
 else:
-    // user did not respond - pick the safe default or notify and skip
+    // follow result.handoffAction when present, otherwise result.nextAction
 ```
 
-If the user answers in chat before the push response arrives, continue normally and call `cancel_question` with the `correlationId` to clean up.
+If the user answers in chat before the push response arrives, call `cancel_question` before acting. If it returns `handoffAction: "stop"`, stop. Otherwise, if it returns false, poll once for 1 second and honor any phone answer that won the race.
 
 **A note on how long ask_user blocks:** the wait time and whether it blocks at all are governed by the site's delivery mode, which the user configures (you do not set it). In the default smart mode and push-only mode, ask_user blocks for the policy timeout; in notify-only mode it returns immediately with `answered: false` after sending the push. Always check `answered` rather than assuming the call blocked, and pass `timeoutMs` only when you need a shorter wait than the site policy.
 

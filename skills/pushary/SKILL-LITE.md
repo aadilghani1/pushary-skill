@@ -57,4 +57,4 @@ Read-only: see your live agent sessions and pending questions (no notification s
 - `propose_scope` once at the start of a multi-step run, never for a single edit, never mid-run to widen
 - Max 3 notifications per task
 - MUST `ask_user` type "confirm" before destructive operations (delete, deploy, force push)
-- If `answered: false`, do NOT execute - notify user it was skipped
+- If `answered: false`, follow `handoffAction` when present, otherwise `nextAction`; after one poll, cancel the phone question before asking in the current client

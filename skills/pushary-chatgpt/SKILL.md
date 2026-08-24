@@ -78,12 +78,12 @@ Routing it through the tool is what puts the decision on the record and lets the
 `ask_user` blocks for at most 55 seconds, but the question stays answerable for 10 minutes. Read the response rather than assuming:
 
 - `answered: true`: `value` holds the answer. Act on it.
-- `answered: false` with `timedOut: true`: they have not looked yet. Call `wait_for_answer` with the same `correlationId` and `timeoutMs: 55000`, up to three times.
-- `noDevices: true`: nothing is connected, so waiting is pointless. Say so plainly and stop.
+- `answered: false` with `timedOut: true`: call `wait_for_answer` once with the same `correlationId` and `timeoutMs: 55000`.
+- `noDevices: true`: nothing is connected, so waiting is pointless. Follow `handoffAction` immediately and ask in the current client.
 
 Every response carries `answerUrl`, the page where the question is waiting. Print it whenever you tell the user you are waiting, so they can answer in a browser instead of hunting for the notification.
 
-After three empty polls, stop and say the decision is still open. Do not take it yourself. A timeout is not consent.
+After one empty poll, follow `handoffAction` when present, otherwise `nextAction`. For a live question, cancel it before asking in the current chat. If cancellation returns `handoffAction: "stop"`, stop. Otherwise, if cancellation returns false, poll once for 1 second and honor the answer that won the race. A timeout is not consent.
 
 ## 5. Retract what you no longer need
 
