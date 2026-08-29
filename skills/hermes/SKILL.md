@@ -1,6 +1,6 @@
 ---
 name: pushary-hermes
-version: 0.7.1
+version: 0.8.0
 description: Push notifications and human-in-the-loop for Hermes Agent. Use this whenever a running agent needs a human and no chat session is active, such as before an irreversible or destructive action, before spending money, deploying, force-pushing or deleting, when blocked on a decision outside your authority, when running unattended and you hit a genuine ambiguity, when another skill's workflow says to confirm with the user, and when a long task finishes or fails with nobody watching. Send alerts when tasks finish, ask questions (yes/no, multiple choice, or free text) via web push, and get answers from the user's lock screen. Use these tools proactively when the user is not actively in a chat session. Works alongside Hermes's built-in messaging platforms (Telegram, Discord, etc.) as a universal fallback channel.
 metadata:
   hermes:
@@ -43,30 +43,31 @@ Every question costs the user their attention wherever they are. Before a run of
 
 ## Setup
 
-Add Pushary as an MCP server in your Hermes `config.yaml`:
-
-```yaml
-mcp:
-  servers:
-    pushary:
-      url: https://pushary.com/api/mcp/sse
-      headers:
-        Authorization: "Bearer ${PUSHARY_API_KEY}"
-```
-
-Set your API key as an environment variable:
-
 ```bash
+npx @pushary/agent-hooks@latest setup --agents hermes
 export PUSHARY_API_KEY="pk_xxx.sk_xxx"
 ```
 
-Sign up at https://pushary.com/sign-up?from=hermes to get your API key.
+That installs `hermes-plugin-pushary` into the interpreter Hermes runs in, enables it, and registers the tools natively. No MCP server config is needed. Sign up at https://pushary.com/sign-up?from=hermes to get your API key.
+
+## Approvals Go to the Phone
+
+The plugin registers `pushary` as a Hermes **approval transport**, so the dangerous-command approvals Hermes already asks for are answered from the lock screen with the same four choices the terminal offers: allow once, allow for this session, always allow, deny. Hermes owns the timeout (300 seconds by default) and remembers session and always decisions exactly as it would have.
+
+```yaml
+security:
+  approval:
+    transport: pushary
+    transport_fallback: builtin
+```
+
+The fallback is what makes it safe to leave on: when no device is connected or Pushary is unreachable, Hermes falls back to its terminal prompt rather than denying the command. You do not call this yourself; it fires when Hermes decides a command needs a human.
 
 ## Tools
 
-### send_notification
+Tool names below are the native plugin names. An MCP client without the plugin sees the same capabilities as `send_notification`, `ask_user`, `wait_for_answer`, `cancel_question`, and `propose_scope`.
 
-(Over MCP this tool is named send_notification; the native Hermes plugin exposes the same capability as pushary_notify.)
+### pushary_notify
 
 Send a one-way push notification. Optionally include structured context for a rich detail page.
 
@@ -76,7 +77,7 @@ Send a one-way push notification. Optionally include structured context for a ri
 |------|------|----------|-------------|
 | title | string | Yes | Notification title (max 100 chars, aim for under 60) |
 | body | string | Yes | Notification body (max 500 chars, aim for under 200) |
-| agentName | string | No | Identifies this Hermes instance (e.g., "Hermes - daily-briefing") |
+| agent_name | string | No | Identifies this Hermes instance (e.g., "Hermes - daily-briefing") |
 | context | object | Yes for task updates | Rich context with type, summary, details, filesChanged, errorMessage, nextSteps. `context.type` marks the notification a task update, and the user's setting for where task updates land can only route one that says so. |
 
 **Example - cron task completed:**
@@ -95,7 +96,7 @@ Send a one-way push notification. Optionally include structured context for a ri
 }
 ```
 
-### ask_user
+### pushary_ask
 
 Ask a question via push notification and **wait for the answer** (blocks by default). Three question types: confirm (yes/no), select (multiple choice), input (free text).
 
@@ -108,7 +109,7 @@ Ask a question via push notification and **wait for the answer** (blocks by defa
 | options | string[] | No | Choices for select type (2-6 options) |
 | placeholder | string | No | Placeholder text for input type |
 | context | string | No | What you're working on, shown above the question |
-| agentName | string | No | Identifies this Hermes instance |
+| agent_name | string | No | Identifies this Hermes instance |
 | wait | boolean | No | Wait for answer before returning (default: true) |
 | timeoutMs | integer | No | Max wait in ms (max 55000). Uses the site policy timeout if omitted. |
 
@@ -127,33 +128,48 @@ Ask a question via push notification and **wait for the answer** (blocks by defa
 }
 ```
 
-### wait_for_answer
+### pushary_wait
 
-Poll for a response when `ask_user` was called with `wait: false`. Not needed with default blocking mode.
+Poll once for a response when `pushary_ask` was called with `wait: false`. Not needed with default blocking mode.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| correlationId | string | Yes | The correlationId from ask_user |
+| correlation_id | string | Yes | The correlationId from pushary_ask |
 | timeoutMs | integer | No | How long to wait (default 30000, max 55000) |
 
-### cancel_question
+### pushary_cancel
 
 Cancel a pending question that's no longer relevant.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| correlationId | string | Yes | The correlationId to cancel |
+| correlation_id | string | Yes | The correlationId to cancel |
+
+### pushary_propose_scope
+
+Agree the boundary of a multi-step run in one tap, before doing the work, instead of asking file by file. Call it ONCE at the start of a run that will change several files.
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| done_when | string | Yes | What "finished" means for this run |
+| allowed_paths | string[] | No | Globs you intend to change, e.g. `["src/**"]` |
+| off_limits_paths | string[] | No | Globs you promise not to touch; these win on overlap |
+| agent_name | string | No | Identifies this Hermes instance |
+
+Returns `ratified: true` only on an explicit yes. Anything else means proceed as if no scope was agreed; do not describe it as ratified.
 
 ## Human-in-the-Loop Flow
 
-One call - `ask_user` blocks and returns the answer:
+One call - `pushary_ask` blocks and returns the answer:
 
 ```
-result = ask_user({
+result = pushary_ask({
   question: "Deploy the updated config to production?",
   type: "confirm",
   context: "nginx config updated with new rate limits",
-  agentName: "Hermes - devops"
+  tool_name: "terminal",
+  tool_target: "systemctl reload",
+  agent_name: "Hermes - devops"
 })
 
 if result.answered:
@@ -162,12 +178,14 @@ if result.answered:
     else:
         // abort and notify via active platform
 else:
-    // fall back to asking in the active chat platform
+    // follow handoffAction when present, otherwise nextAction
 ```
+
+Pass `tool_name` and `tool_target` whenever the question is about a specific operation. They are what let the user turn a repeated approval into a standing rule, and what group the decision in their ledger.
 
 ## Identifying Your Instance
 
-Always pass `agentName` so the user knows which Hermes profile or task is asking.
+Always pass `agent_name` so the user knows which Hermes profile or task is asking.
 
 **Format:** `"Hermes - {profile or task}"`
 
