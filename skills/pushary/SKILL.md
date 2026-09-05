@@ -348,7 +348,7 @@ else:
 
 If the user answers in chat before the push response arrives, call `cancel_question` before acting. If it returns `handoffAction: "stop"`, stop. Otherwise, if it returns false, poll once for 1 second and honor any phone answer that won the race.
 
-**A note on how long ask_user blocks:** the wait time and whether it blocks at all are governed by the site's delivery mode, which the user configures (you do not set it). In the default smart mode and push-only mode, ask_user blocks for the policy timeout; in notify-only mode it returns immediately with `answered: false` after sending the push. Always check `answered` rather than assuming the call blocked, and pass `timeoutMs` only when you need a shorter wait than the site policy.
+**A note on how long ask_user blocks:** the wait time and whether it blocks at all are governed by the site's delivery mode, which the user configures (you do not set it). The four modes are "When I'm out" (`push_first`, the default), "Every time" (`push_only`), "Updates" (`notify_only`) and "Terminal" (`terminal_only`). In When I'm out, ask_user blocks for the push-first window (45 seconds by default) and the phone is only asked when the user is away from their terminal or their Mac; in Every time it blocks for the policy timeout and the phone is always asked; in Updates it returns immediately with `answered: false` after telling the phone, because the decision belongs in the current client; in Terminal nothing reaches the phone and it also returns immediately with `answered: false`. Always check `answered` rather than assuming the call blocked, and pass `timeoutMs` only when you need a shorter wait than the site policy.
 
 ## Identifying Your Agent
 
