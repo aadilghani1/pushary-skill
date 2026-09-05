@@ -1,53 +1,40 @@
-# Contributing to Pushary Agent Skill
+# Contributing
 
-Thanks for your interest in contributing! This guide will help you get started.
+Bug reports, documentation fixes, runnable examples, and patches are welcome.
+Open an issue in this public repository, or fork it and open a pull request here.
+You do not need access to Pushary's private repository to contribute.
 
-## How to Contribute
+## Start small
 
-### Reporting Bugs
+Pick an unassigned `good first issue`, explain the change you plan, and include
+steps that another developer can use to verify it. For a bug, include the package
+and framework versions, your OS, expected behavior, and a minimal reproduction.
+Never include API keys, enrollment links, customer data, or private transcripts.
 
-If something isn't working as expected, [open a bug report](https://github.com/pushary/pushary-skill/issues/new?template=bug_report.md). Please include:
+For a JavaScript adapter, run `npm install`, `npm run typecheck`, `npm test`, and
+`npm run build` in your clone. Follow the README for Python or plugin-specific
+setup. Documentation changes should have working links and commands you tried.
 
-- Which AI agent you're using (Cursor, Claude Code, Windsurf, etc.)
-- Your MCP configuration
-- What you expected to happen vs. what actually happened
-- Steps to reproduce the issue
+## How your patch ships
 
-### Suggesting Features
+This repository is a public mirror of a directory in Pushary's private monorepo.
+We review your PR here, then apply accepted changes upstream before publishing
+this mirror. A direct merge into the mirror could be overwritten by the next sync.
 
-Have an idea for improving the skill? [Open a feature request](https://github.com/pushary/pushary-skill/issues/new?template=feature_request.md). We'd love to hear how Pushary could work better for your workflow.
+The maintainer handling your PR will:
 
-### Submitting Changes
+1. Review the patch and discuss requested changes in the public PR.
+2. Apply accepted changes upstream, retaining author attribution in that commit.
+3. Run the relevant checks, release a package if needed, and sync this repository.
+4. Link the public sync commit and released version (when applicable) back to your
+   PR, credit your contribution publicly, then close it as shipped.
 
-**This repository is a published copy, not where the skill is written.** The
-source lives in Pushary's private monorepo and is pushed here whenever it
-changes, so a commit landed directly on this repo is overwritten by the next
-publish. Two pull requests were merged here and then sat stranded for a month
-for exactly that reason.
+Public sync commits squash private history, so upstream author attribution does
+not automatically appear in this mirror's GitHub contributor graph. The public
+PR and shipping comment preserve visible credit. An upstream-only patch is not
+considered shipped. If we cannot accept a change, we explain why on the PR.
 
-So please **open an issue** rather than a pull request. Paste your diff into it
-if you already have one, and it will be applied upstream and credited to you.
-A pull request opened here is read and treated the same way, as a patch to
-apply upstream, but it will not be merged as a pull request, because merging it
-would guarantee it gets erased.
+## Security
 
-Security issues: email aadil@pushary.com rather than opening an issue.
-
-### What Can I Contribute?
-
-This repository contains the skill definition (not the Pushary backend), so contributions typically involve:
-
-- **Documentation** — Improving setup guides, examples, or tool descriptions
-- **Skill definition** — Better usage guidelines, new notification patterns, improved etiquette rules
-- **Templates** — Better issue/PR templates
-- **Integrations** — Examples for specific agents or workflows
-
-### Style Guidelines
-
-- Keep documentation clear and concise
-- Use concrete examples over abstract descriptions
-- Test any configuration changes with at least one MCP-compatible agent
-
-## Questions?
-
-If you're not sure about something, [open a discussion](https://github.com/pushary/pushary-skill/issues) or reach out. We're happy to help.
+Report vulnerabilities privately to aadil@pushary.com instead of opening a public
+issue. If this repository has a SECURITY.md, follow its disclosure guidance.

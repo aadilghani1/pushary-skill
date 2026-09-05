@@ -20,6 +20,26 @@
   <a href="https://glama.ai/mcp/servers/Pushary/pushary-skill"><img src="https://glama.ai/mcp/servers/Pushary/pushary-skill/badges/score.svg" alt="Glama score" /></a>
 </p>
 
+## Start here
+
+**[Try an approval without signing up](https://pushary.com/try?utm_source=github&utm_medium=oss-skill&utm_campaign=pushary-skill&utm_content=demo)**
+→ connect an open phone page → approve or decline → see the agent continue or stop.
+This browser demo uses polling and temporary state, not real push delivery or the production ledger.
+
+| What you want to build | Start with |
+| --- | --- |
+| Notifications and questions for a coding agent | The setup instructions below |
+| An enforced tool approval in the Vercel AI SDK | [Runnable AI SDK example](https://github.com/Pushary/pushary-ai-sdk/tree/main/examples) |
+| A LangGraph workflow that branches on a human decision | [Runnable LangGraph example](https://github.com/Pushary/pushary-langgraph/tree/main/examples) |
+| Another agent framework | [All Pushary integrations](https://github.com/Pushary) |
+
+The skill and adapters are MIT-licensed. Hosted phone delivery requires a Pushary
+account; embedding approvals for your own users requires Partner access.
+The two framework examples also run locally with simulated answers and no credentials.
+
+If Pushary helped you, [star this repo](https://github.com/Pushary/pushary-skill).
+Want to help? [Public issues and patches are welcome](CONTRIBUTING.md).
+
 ---
 
 Your AI agent finishes a 20-minute refactor while you're making coffee. Without Pushary, you'd never know until you checked back. With Pushary, you get a push notification on your phone the moment it's done - or a question on your lock screen when the agent needs a decision. It's the tool behind "keep going, ping me on my phone if you need anything".
